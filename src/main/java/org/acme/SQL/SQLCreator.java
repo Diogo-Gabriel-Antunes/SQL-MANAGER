@@ -66,6 +66,11 @@ public class SQLCreator {
         return this;
     }
 
+    public SQLCreator paramLike(String paramStr, String paramString) {
+        param.put(paramStr, "%"+paramString+"%");
+        return this;
+    }
+
     public SQLCreator consultaNativa(Boolean consultaNativa) {
         this.consultaNativa = consultaNativa;
         return this;
