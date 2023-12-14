@@ -26,7 +26,7 @@ public class SQLCreator {
     private Integer offset;
     private String orderBy;
 
-    private Boolean consultaNativa ;
+    private Boolean consultaNativa;
 
     public void setEm(EntityManager em) {
         this.em = em;
@@ -67,7 +67,7 @@ public class SQLCreator {
     }
 
     public SQLCreator paramLike(String paramStr, String paramString) {
-        param.put(paramStr, "%"+paramString+"%");
+        param.put(paramStr, "%" + paramString + "%");
         return this;
     }
 
@@ -81,15 +81,15 @@ public class SQLCreator {
         String from = " FROM " + this.from.toString();
         String where = this.where.toString();
         String sql = null;
-        if (orderBy != null && offset != null) {
+        if (orderBy != null && offset != null && limit != null) {
+            sql = select + from + where + " ORDER BY " + orderBy + " LIMIT " + limit + " OFFSET " + offset;
+        } else if (orderBy != null && offset != null && limit != null) {
             sql = select + from + where + " ORDER BY " + orderBy + " OFFSET " + offset;
         } else if (orderBy != null) {
             sql = select + from + where + " ORDER BY " + orderBy;
         }
 
-        if (limit != null) {
-            sql += " LIMIT " + limit;
-        }
+
 
         Query query = null;
         if (BooleanUtils.isTrue(consultaNativa) && tClass != null) {
