@@ -1,19 +1,17 @@
 package org.acme.SQL;
 
 
-import jakarta.inject.Inject;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.acme.Util.CollectionsUtil;
-import org.acme.Util.PrimitiveUtil.BooleanUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class SQLCreator {
 
-    @Inject
     EntityManager em;
     private StringBuilder select = new StringBuilder();
     private HashMap campos = new HashMap();
@@ -87,12 +85,14 @@ public class SQLCreator {
             sql = select + from + where + " ORDER BY " + orderBy + " OFFSET " + offset;
         } else if (orderBy != null) {
             sql = select + from + where + " ORDER BY " + orderBy;
+        }else{
+            sql = select + from + where;
         }
 
 
 
         Query query = null;
-        if (BooleanUtils.isTrue(consultaNativa) && tClass != null) {
+        if (consultaNativa != null && consultaNativa && tClass != null) {
             query = em.createNativeQuery(sql);
         } else if (tClass != null) {
             query = em.createQuery(sql);
@@ -121,12 +121,24 @@ public class SQLCreator {
 
 
         Collection result = query.getResultList();
-        if (CollectionsUtil.isValid(result)) {
+        if (result != null && !result.isEmpty()) {
             return (List<T>) result;
         }
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SQLCreator that = (SQLCreator) o;
+        return Objects.equals(em, that.em) && Objects.equals(select, that.select) && Objects.equals(campos, that.campos) && Objects.equals(from, that.from) && Objects.equals(where, that.where) && Objects.equals(param, that.param) && Objects.equals(invokers, that.invokers) && Objects.equals(limit, that.limit) && Objects.equals(offset, that.offset) && Objects.equals(orderBy, that.orderBy) && Objects.equals(consultaNativa, that.consultaNativa);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(em, select, campos, from, where, param, invokers, limit, offset, orderBy, consultaNativa);
+    }
 
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
